@@ -14,9 +14,9 @@ import { createHighScore } from "@/lib/high-score"
 import {
   KEY_DIRS,
   SIZE,
-  TICK_MS,
   initialState,
   reducer,
+  tickMsFor,
   type Status,
 } from "@/lib/game-snake"
 import { cn } from "@/lib/utils"
@@ -34,7 +34,7 @@ const OVERLAY_TEXT: Record<Status, string> = {
 
 const HELP_STEPS = [
   "Swipe or use the arrow keys / WASD to steer.",
-  "Eat the dots to grow and score.",
+  "Eat the dots to grow and score — every 5th drops a timed bonus worth 3.",
   "Walls and your own tail end the game.",
   "P pauses; R restarts.",
 ]
@@ -55,7 +55,7 @@ export function SnakeGame() {
     highScoreStore.save(state.score) // save() no-ops when not a new best
   }, [state.score])
 
-  useGameTick(state.status, TICK_MS, () => send({ type: "tick" }))
+  useGameTick(state.status, tickMsFor(state.score), () => send({ type: "tick" }))
 
   useGameKeys({
     helpOpen,
@@ -76,6 +76,9 @@ export function SnakeGame() {
     cells.set(segment.y * SIZE + segment.x, index)
   })
   const foodIndex = state.food.y * SIZE + state.food.x
+  const bonusIndex = state.bonus
+    ? state.bonus.y * SIZE + state.bonus.x
+    : -1
 
   return (
     <GameScreen
@@ -113,7 +116,9 @@ export function SnakeGame() {
                   segment !== undefined &&
                     segment !== 0 &&
                     "bg-[var(--accent-soft)]",
-                  index === foodIndex && "bg-[var(--food)]"
+                  index === foodIndex && "bg-[var(--food)]",
+                  index === bonusIndex &&
+                    "bg-[var(--bonus)] ring-2 ring-inset ring-foreground animate-pulse"
                 )}
               />
             )

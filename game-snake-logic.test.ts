@@ -1,6 +1,18 @@
 import { describe, expect, test } from "bun:test"
 
-import { SIZE, START, initialState, reducer, type State } from "@/lib/game-snake"
+import {
+  BONUS_EVERY,
+  BONUS_POINTS,
+  BONUS_TTL,
+  MIN_TICK_MS,
+  SIZE,
+  START,
+  TICK_MS,
+  initialState,
+  reducer,
+  tickMsFor,
+  type State,
+} from "@/lib/game-snake"
 
 /** A snake game, easily overridden. */
 function make(overrides: Partial<State> = {}): State {
@@ -113,6 +125,87 @@ describe("snake lifecycle", () => {
     expect(next.score).toBe(0)
     expect(next.snake.length).toBe(3)
     expect(next.snake.every((segment) => segment.x >= 0 && segment.x < SIZE && segment.y >= 0 && segment.y < SIZE)).toBe(true)
+  })
+})
+
+describe("snake speed ramp", () => {
+  test("speeds up with the score down to a floor", () => {
+    expect(tickMsFor(0)).toBe(TICK_MS)
+    expect(tickMsFor(1)).toBeLessThan(TICK_MS)
+    expect(tickMsFor(1000)).toBe(MIN_TICK_MS)
+  })
+})
+
+describe("snake bonus fruit", () => {
+  test("drops a timed bonus on every Nth fruit", () => {
+    const state = make({
+      status: "running",
+      snake: [
+        { x: 5, y: 5 },
+        { x: 4, y: 5 },
+        { x: 3, y: 5 },
+      ],
+      food: { x: 6, y: 5 },
+      dir: "right",
+      pendingDir: "right",
+      score: BONUS_EVERY - 1,
+    })
+
+    const next = reducer(state, { type: "tick" })
+    expect(next.score).toBe(BONUS_EVERY)
+    expect(next.bonus).not.toBeNull()
+    expect(next.bonusTtl).toBe(BONUS_TTL)
+    // Food and bonus never overlap, and neither sits on the body.
+    expect(next.food).not.toEqual(next.bonus)
+    for (const segment of next.snake) {
+      expect(next.food).not.toEqual(segment)
+    }
+  })
+
+  test("expires after its ttl when it is not eaten", () => {
+    let state = make({
+      status: "running",
+      snake: [
+        { x: 5, y: 5 },
+        { x: 4, y: 5 },
+        { x: 3, y: 5 },
+      ],
+      food: { x: 14, y: 10 },
+      bonus: { x: 0, y: 0 },
+      bonusTtl: 3,
+      dir: "right",
+      pendingDir: "right",
+    })
+
+    state = reducer(state, { type: "tick" })
+    expect(state.bonusTtl).toBe(2)
+    state = reducer(state, { type: "tick" })
+    expect(state.bonusTtl).toBe(1)
+    state = reducer(state, { type: "tick" })
+    expect(state.bonus).toBeNull()
+    expect(state.bonusTtl).toBe(0)
+  })
+
+  test("eating the bonus scores without growing the snake", () => {
+    const state = make({
+      status: "running",
+      snake: [
+        { x: 5, y: 5 },
+        { x: 4, y: 5 },
+        { x: 3, y: 5 },
+      ],
+      food: { x: 14, y: 10 },
+      bonus: { x: 6, y: 5 },
+      bonusTtl: BONUS_TTL,
+      dir: "right",
+      pendingDir: "right",
+    })
+
+    const next = reducer(state, { type: "tick" })
+    expect(next.snake[0]).toEqual({ x: 6, y: 5 })
+    expect(next.score).toBe(BONUS_POINTS)
+    expect(next.snake).toHaveLength(3)
+    expect(next.bonus).toBeNull()
   })
 })
 

@@ -133,5 +133,6 @@ export function accentVars(title: string): CSSProperties {
     "--accent-soft": rgbCss(color, 0.55),
     "--accent-pipe": rgbCss(color, 0.85),
     "--food": "rgb(239 68 68)",
+    "--bonus": "rgb(250 204 21)",
   } as CSSProperties
 }
