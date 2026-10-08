@@ -1,11 +1,11 @@
 import { ImageResponse } from "next/og"
 
-import { OgBird } from "@/components/og-bird"
+import { OgDither } from "@/components/og-dither"
 
 export const size = { width: 64, height: 64 }
 export const contentType = "image/png"
 
-/** The bird on the same dithered-blue field as the Open Graph card. */
+/** The same dithered-blue field as the Open Graph card, on its own. */
 export default function Icon() {
   return new ImageResponse(
     (
@@ -15,25 +15,17 @@ export default function Icon() {
           width: "100%",
           height: "100%",
           display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
           background: "linear-gradient(135deg,#050912,#0f2b52)",
         }}
       >
-        <div
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            display: "flex",
-            backgroundImage:
-              "radial-gradient(rgba(96,165,250,0.5) 1px, transparent 1px)",
-            backgroundSize: "8px 8px",
-          }}
+        <OgDither
+          width={size.width}
+          height={size.height}
+          spacing={8}
+          dot={2.5}
+          color="#7dd3fc"
+          opacity={0.7}
         />
-        <OgBird scale={0.2} />
       </div>
     ),
     { ...size }

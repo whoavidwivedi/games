@@ -1,11 +1,12 @@
 import { ImageResponse } from "next/og"
 
-import { OgBird } from "@/components/og-bird"
+import { OgDither } from "@/components/og-dither"
 
 export const alt = "Arcade — Snake, Tic-Tac-Toe and more, in your browser"
 export const size = { width: 1200, height: 630 }
 export const contentType = "image/png"
 
+/** A dithered-blue field with the wordmark — no other art. */
 export default function OpengraphImage() {
   return new ImageResponse(
     (
@@ -21,48 +22,31 @@ export default function OpengraphImage() {
           background: "linear-gradient(135deg,#070b16,#0e2138 70%)",
         }}
       >
-        {/* Dither: a blue dot grid across the whole canvas. */}
-        <div
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            display: "flex",
-            backgroundImage:
-              "radial-gradient(rgba(96,165,250,0.45) 1.5px, transparent 1.5px)",
-            backgroundSize: "14px 14px",
-          }}
-        />
+        <OgDither width={size.width} height={size.height} spacing={22} dot={4} />
 
         <div
           style={{
             position: "relative",
             display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
+            flexDirection: "column",
+            gap: 20,
           }}
         >
-          <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-            <div
-              style={{
-                display: "flex",
-                fontSize: 112,
-                fontWeight: 800,
-                letterSpacing: -3,
-                lineHeight: 1,
-                color: "#ffffff",
-              }}
-            >
-              ARCADE
-            </div>
-            <div style={{ display: "flex", fontSize: 34, color: "#93c5fd" }}>
-              Classic games, right in your browser
-            </div>
+          <div
+            style={{
+              display: "flex",
+              fontSize: 128,
+              fontWeight: 800,
+              letterSpacing: -4,
+              lineHeight: 1,
+              color: "#ffffff",
+            }}
+          >
+            ARCADE
           </div>
-          <OgBird scale={1.25} />
+          <div style={{ display: "flex", fontSize: 36, color: "#93c5fd" }}>
+            Classic games, right in your browser
+          </div>
         </div>
 
         <div
