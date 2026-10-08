@@ -1,15 +1,23 @@
 {
-  "name": "game",
-  "version": "0.0.1",
-  "type": "module",
+  "name": "games",
+  "version": "1.0.0",
+  "description": "A retro browser arcade: sixteen classic games built with Next.js, React and Tailwind CSS.",
+  "license": "MIT",
   "private": true,
+  "type": "module",
+  "homepage": "https://github.com/whoavidwivedi/games",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/whoavidwivedi/games.git"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "format": "prettier --write \"**/*.{ts,tsx}\"",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "bun test",
+    "format": "prettier --write \"**/*.{ts,tsx}\""
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",
