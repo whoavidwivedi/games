@@ -130,3 +130,204 @@
     @apply font-sans;
     }
 }
+
+/* --- transitions.dev: Number pop-in (skill 02-number-pop-in) ------------- */
+
+:root {
+    --digit-dur: 500ms;
+    --digit-distance: 8px;
+    --digit-stagger: 70ms;
+    --digit-blur: 2px;
+    --digit-ease: cubic-bezier(0.34, 1.45, 0.64, 1);
+    --digit-dir-x: 0;
+    --digit-dir-y: 1;
+}
+
+@keyframes t-digit-pop-in {
+    0% {
+        transform: translate(
+            calc(var(--digit-distance) * var(--digit-dir-x)),
+            calc(var(--digit-distance) * var(--digit-dir-y))
+        );
+        opacity: 0;
+        filter: blur(var(--digit-blur));
+    }
+    100% {
+        transform: translate(0, 0);
+        opacity: 1;
+        filter: blur(0);
+    }
+}
+
+.t-digit-group {
+    display: inline-flex;
+    align-items: baseline;
+}
+.t-digit {
+    display: inline-block;
+}
+.t-digit-group.is-animating .t-digit {
+    /* will-change only while the pop runs: a permanent one would hold a
+       compositor layer for every digit of every 2048 tile. */
+    will-change: transform, opacity, filter;
+    animation: t-digit-pop-in var(--digit-dur) var(--digit-ease) both;
+}
+.t-digit-group.is-animating .t-digit[data-stagger="1"] {
+    animation-delay: var(--digit-stagger);
+}
+.t-digit-group.is-animating .t-digit[data-stagger="2"] {
+    animation-delay: calc(var(--digit-stagger) * 2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .t-digit-group .t-digit {
+        animation: none !important;
+    }
+}
+
+/* --- transitions.dev: Like button (skill 23-like-button) ----------------- */
+
+:root {
+    --like-color: #f40051;
+    --like-fill: 150ms;
+    --like-pop: 350ms;
+    --like-pop-ease: cubic-bezier(0.34, 1.96, 0.64, 1);
+    --like-particle-dur: 600ms;
+    --like-particle-dist: 20px;
+    --like-particle-size: 2.5px;
+    --like-ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.t-like-heart { color: currentColor; transition: color var(--like-fill) var(--like-ease); }
+.t-like-heart path {
+  fill: transparent; stroke: currentColor;
+  transition: fill var(--like-fill) var(--like-ease), stroke var(--like-fill) var(--like-ease);
+}
+.t-like[data-liked="true"] .t-like-heart { color: var(--like-color); }
+.t-like[data-liked="true"] .t-like-heart path { fill: currentColor; }
+/* Pop scale lives on an HTML wrapper, never the <svg> itself:
+   transforming an inline SVG makes Chromium rasterise it at 1×
+   (pixelated on hi-DPI). Wrapping keeps the vector crisp. */
+.t-like[data-liked="true"] .t-like-icon { animation: t-like-pop var(--like-pop) var(--like-pop-ease); }
+@keyframes t-like-pop { 0% { transform: scale(1); } 30% { transform: scale(0.82); } 100% { transform: scale(1); } }
+
+/* Particle burst: 8 dots flung along per-particle vectors. */
+.t-like-particles { position: absolute; left: 50%; top: 50%; width: 0; height: 0; pointer-events: none; color: var(--like-color); }
+.t-like-particles i {
+  position: absolute;
+  left: calc(var(--like-particle-size) * var(--psize, 1) / -2);
+  top: calc(var(--like-particle-size) * var(--psize, 1) / -2);
+  width: calc(var(--like-particle-size) * var(--psize, 1));
+  height: calc(var(--like-particle-size) * var(--psize, 1));
+  border-radius: 50%; background: currentColor; opacity: 0;
+}
+@keyframes t-like-burst {
+  0%   { opacity: 0; transform: translate(0, 0) scale(0.4); }
+  20%  { opacity: 1; transform: translate(calc(var(--px) * 0.25), calc(var(--py) * 0.25)) scale(1); }
+  100% { opacity: 0; transform: translate(var(--px), var(--py)) scale(var(--p-end-scale, 0.6)); }
+}
+.t-like.is-bursting .t-like-particles i {
+  animation: t-like-burst var(--pdur, var(--like-particle-dur)) ease-out var(--pdelay, 0ms) forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .t-like-icon, .t-like-particles i { animation: none !important; }
+}
+
+/* Game tiles take ink that flips with the theme: the tile always sits on the
+   same side of the accent ↔ background mix as the theme, so low and high
+   numbers stay readable in both themes without per-value thresholds. */
+.tile-ink { color: var(--foreground); }
+/* Dark theme 2048: tiles progress from near-black (low values) up to the
+   bright game accent, so the top tiers switch back to the theme's dark ink. */
+.dark .tile-ink-hi { color: var(--background); }
+
+/* Dithered fill for in-game props (e.g. Flappy's pipes): a crisp 4px
+   checkerboard between the game's accent pipe colour and a faded mix of it,
+   echoing the card cover's dither. */
+.px-dither {
+  background-image: repeating-conic-gradient(
+    var(--accent-pipe) 0% 25%,
+    color-mix(in oklch, var(--accent-pipe) 55%, var(--background)) 25% 50%
+  );
+  background-size: 4px 4px;
+}
+
+/* Pixel bird wing flap (Flappy). The hinge is the wing's left edge, in
+   viewBox units. */
+.fb-wing { transform-box: view-box; transform-origin: 3px 5px; }
+.fb-flap { animation: fb-flap 0.32s linear infinite; }
+@keyframes fb-flap {
+  0%, 100% { transform: rotate(6deg); }
+  50% { transform: rotate(-32deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fb-flap { animation: none; }
+}
+
+/* Like the toggle's is-init: a stored favourite re-fills after hydration,
+   which would replay the pop for every heart on load. Only a real click
+   earns the celebration, so the pop waits for the first interaction. */
+.t-like:not(.is-init) .t-like-icon { animation: none !important; }
+
+/* --- transitions.dev: Text states swap (skill 04-text-states-swap) -------- */
+
+:root {
+    --text-swap-dur: 150ms;
+    --text-swap-translate-y: 4px;
+    --text-swap-blur: 2px;
+    --text-swap-ease: ease-in-out;
+}
+
+/* The SiteHeader title swaps by remounting against the route; this entrance
+   replays from below with blur on every swap, in either direction (and on a
+   plain reload — see SiteHeader). */
+.t-text-swap {
+    display: inline-block;
+    animation: t-text-swap-enter var(--text-swap-dur) var(--text-swap-ease) both;
+    will-change: transform, filter, opacity;
+}
+@keyframes t-text-swap-enter {
+    from {
+        transform: translateY(var(--text-swap-translate-y));
+        filter: blur(var(--text-swap-blur));
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        filter: blur(0);
+        opacity: 1;
+    }
+}
+
+@keyframes screen-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Game screens fade in on entry so soft-navving into a game feels as
+   deliberate as leaving one (shell pages animate their header title). */
+.game-screen-in {
+    animation: screen-in 180ms ease-out both;
+}
+
+/* The shell's card grid, keyed by the route in GamesSection: Games and
+   Favourites fade in on every hop, so neither direction is the plain one. */
+.shell-in {
+    animation: screen-in 180ms ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .t-text-swap { animation: none !important; }
+    .game-screen-in, .shell-in { animation: none; }
+}
+
+/* --- game board sizing --------------------------------------------------- */
+
+/* The play area: a square that fits inside the screen with the fixed game
+   chrome reserved (header 28px + footer 50px + two 12px gaps = 102px).
+   cq units resolve against GameScreen, which is the size container. Keep
+   102px in sync if a game's header or footer ever changes height. */
+.game-board {
+    width: min(100cqw, calc(100cqh - 102px));
+}
