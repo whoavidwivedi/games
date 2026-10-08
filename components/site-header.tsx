@@ -9,7 +9,7 @@ import { ThemeToggle } from "@/components/theme-toggle"
 
 /**
  * The header shown on the shell pages (home + favourites). It stays mounted
- * across client-side navigation: tapping the heart swaps "Games" to
+ * across client-side navigation: tapping the heart swaps "Arcade" to
  * "Favourites" and the home button swaps it back, remounting the title off
  * the route so the t-text-swap entrance replays on the way out *and* the way
  * back (a plain reload replays it too, which is what keeps it alive when the
@@ -20,7 +20,7 @@ export function SiteHeader() {
   const pathname = usePathname()
   const onFavourites = pathname === "/favourites"
 
-  const title = onFavourites ? "Favourites" : "Games"
+  const title = onFavourites ? "Favourites" : "Arcade"
 
   // Game routes render their own in-game header, so nothing is shown here.
   const hiddenOnRoute = pathname.startsWith("/games/")

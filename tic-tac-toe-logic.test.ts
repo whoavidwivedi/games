@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test"
 
 import {
+  bestMove,
   initialState,
   reducer,
   winnerOf,
@@ -86,6 +87,56 @@ describe("place", () => {
     const next = reducer(state, { type: "place", index: 8 })
     expect(next.status).toBe("over")
     expect(next.winner).toBe("draw")
+  })
+})
+
+describe("system opponent", () => {
+  test("bestMove takes an immediate win", () => {
+    const b = board(["o", "o", ".", "x", "x", ".", ".", ".", "."])
+    const move = bestMove(b, "o")
+    const next = b.slice()
+    next[move] = "o"
+    expect(winnerOf(next)).toBe("o")
+  })
+
+  test("bestMove blocks the opponent's winning move", () => {
+    const b = board(["x", "x", ".", "o", ".", ".", ".", ".", "."])
+    expect(bestMove(b, "o")).toBe(2)
+  })
+
+  test("the system answers every human move", () => {
+    let state: State = { ...initialState, status: "running", mode: "system" }
+    state = reducer(state, { type: "place", index: 4 })
+    expect(state.board[4]).toBe("x")
+    expect(state.board.filter((cell) => cell !== null)).toHaveLength(2)
+    expect(state.turn).toBe("x")
+  })
+
+  test("the system never lets the human win a runaway game", () => {
+    let state: State = {
+      ...initialState,
+      mode: "system",
+      status: "running",
+    }
+    while (state.status === "running") {
+      const empty = state.board
+        .map((cell, i) => (cell === null ? i : -1))
+        .filter((i) => i >= 0)[0]
+      state = reducer(state, { type: "place", index: empty })
+    }
+    expect(state.winner).not.toBe("x")
+  })
+
+  test("switching mode resets the board and the tally", () => {
+    const next = reducer(
+      { ...initialState, xWins: 3, oWins: 2, mode: "system" },
+      { type: "setMode", mode: "two-player" }
+    )
+    expect(next.mode).toBe("two-player")
+    expect(next.xWins).toBe(0)
+    expect(next.oWins).toBe(0)
+    expect(next.status).toBe("running")
+    expect(next.board.every((cell) => cell === null)).toBe(true)
   })
 })
 

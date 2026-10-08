@@ -1,6 +1,7 @@
 "use client"
 
 import { usePathname } from "next/navigation"
+import { RiAddLine } from "@remixicon/react"
 
 import { GameCard } from "@/components/game-card"
 import type { Game } from "@/lib/games"
@@ -11,7 +12,14 @@ import type { Game } from "@/lib/games"
  * swap reads the same in both directions instead of only the one that
  * happens to mount fresh.
  */
-export function GamesSection({ games }: { games: Game[] }) {
+export function GamesSection({
+  games,
+  showComingSoon = false,
+}: {
+  games: Game[]
+  /** Show a dotted placeholder tile for unannounced games. Home only. */
+  showComingSoon?: boolean
+}) {
   const pathname = usePathname()
 
   return (
@@ -20,6 +28,16 @@ export function GamesSection({ games }: { games: Game[] }) {
         {games.map((game) => (
           <GameCard key={game.title} {...game} />
         ))}
+        {showComingSoon && (
+          <div className="flex min-h-48 flex-col items-center justify-center gap-1.5 rounded-2xl border-2 border-dotted border-border p-4 text-center">
+            <RiAddLine
+              className="size-5 text-muted-foreground"
+              aria-hidden="true"
+            />
+            <p className="text-sm font-medium">More games</p>
+            <p className="text-xs text-muted-foreground">Coming soon</p>
+          </div>
+        )}
       </div>
     </section>
   )

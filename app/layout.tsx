@@ -4,14 +4,33 @@ import { ThemeProvider as NextThemesProvider } from "next-themes"
 
 import "./globals.css"
 import { SiteHeader } from "@/components/site-header"
+import { SITE_URL } from "@/lib/site"
 import { cn } from "@/lib/utils"
 
+const description =
+  "A retro browser arcade: play Snake and Tic-Tac-Toe instantly — no accounts, no ads."
+
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: {
-    default: "Games",
-    template: "%s · Games",
+    default: "Arcade",
+    template: "%s · Arcade",
   },
-  description: "Play classic games right in your browser.",
+  applicationName: "Arcade",
+  description,
+  keywords: ["arcade", "browser games", "snake", "tic-tac-toe", "retro games"],
+  openGraph: {
+    type: "website",
+    siteName: "Arcade",
+    title: "Arcade",
+    description,
+    url: "/",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Arcade",
+    description,
+  },
 }
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" })

@@ -1,31 +1,17 @@
-# Games
+# Arcade
 
-A retro browser arcade: sixteen classic games, built with Next.js and React, playable instantly with a keyboard, mouse or touch. No accounts and no ads — your high scores and favourites stay in your browser.
+A retro browser arcade: Snake and Tic-Tac-Toe, built with Next.js and React, playable instantly with a keyboard, mouse or touch. No accounts and no ads — your high scores and favourites stay in your browser.
 
 ## Games
 
 | Game | What you do |
 | --- | --- |
 | [Snake](/games/snake) | Eat the dots, grow longer, and don't hit the walls or yourself. |
-| [Tic-Tac-Toe](/games/tic-tac-toe) | Line up three against a friend locally. |
-| [2048](/games/2048) | Slide the tiles and merge your way to 2048. |
-| [Minesweeper](/games/minesweeper) | Clear the board without detonating a mine. |
-| [Tetris](/games/tetris) | Stack falling tetrominoes and clear the lines. |
-| [Pong](/games/pong) | Rally the ball past your opponent. |
-| [Breakout](/games/breakout) | Smash every brick with a bouncing ball. |
-| [Flappy](/games/flappy) | Tap to fly through the gaps in the pipes. |
-| [Memory Match](/games/memory-match) | Find every hidden pair on the board. |
-| [Simon](/games/simon) | Repeat the ever-growing sequence of colours. |
-| [Connect Four](/games/connect-four) | Drop four discs in a row before your rival. |
-| [Whack-a-Mole](/games/whack-a-mole) | Pop the moles before they duck away. |
-| [Space Invaders](/games/space-invaders) | Shoot down the descending alien formation. |
-| [Frogger](/games/frogger) | Hop across the road and river unharmed. |
-| [Hangman](/games/hangman) | Guess the word one letter at a time. |
-| [Sudoku](/games/sudoku) | Fill the grid so every row, column and box fits. |
+| [Tic-Tac-Toe](/games/tic-tac-toe) | Line up three against a friend locally, or a system opponent that never loses. |
 
 ## Features
 
-- **Sixteen games**, each fully playable in the browser.
+- **Snake and Tic-Tac-Toe**, both fully playable in the browser.
 - **Keyboard, mouse and touch** — arrow keys / WASD, on-screen controls, and swipe on mobile.
 - **Playful retro look** — pixel-art pieces and per-game accents, with generative dithered covers.
 - **Dark and light themes** that follow your system preference.

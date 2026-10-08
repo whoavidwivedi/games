@@ -1,7 +1,7 @@
 {
-  "name": "games",
+  "name": "arcade",
   "version": "1.0.0",
-  "description": "A retro browser arcade: sixteen classic games built with Next.js, React and Tailwind CSS.",
+  "description": "A retro browser arcade: Snake and Tic-Tac-Toe built with Next.js, React and Tailwind CSS.",
   "license": "MIT",
   "private": true,
   "type": "module",

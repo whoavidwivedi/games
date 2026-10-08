@@ -6,6 +6,7 @@ import { GameFooter, GameHeader, StatusOverlay } from "@/components/game-chrome"
 import { GameScreen } from "@/components/game-screen"
 import { HelpOverlay } from "@/components/game-help"
 import { PixelScore } from "@/components/pixel-score"
+import { Button } from "@/components/ui/button"
 import { useGameKeys } from "@/hooks/use-game-keys"
 import { accentVars } from "@/lib/games"
 import { initialState, reducer, type Status } from "@/lib/game-tic-tac-toe"
@@ -18,8 +19,8 @@ const OVERLAY_TEXT: Record<Status, string> = {
 }
 
 const HELP_STEPS = [
-  "Take turns with a friend on the same phone.",
-  "Tap a cell to drop your mark.",
+  "Take turns on one phone, or switch to System to play the computer.",
+  "Tap a cell to drop your mark — X always starts.",
   "Line up three in a row to win the round.",
   "The tally carries across rematches.",
 ]
@@ -65,6 +66,7 @@ const KEY_CELLS: Record<string, number> = {
 export function TicTacToeGame() {
   const [state, send] = useReducer(reducer, initialState)
   const [helpOpen, setHelpOpen] = useState(false)
+  const system = state.mode === "system"
 
   useGameKeys({
     helpOpen,
@@ -86,26 +88,35 @@ export function TicTacToeGame() {
       ? state.winner === "draw"
         ? "It's a draw"
         : state.winner === "x"
-          ? "X wins!"
-          : "O wins!"
+          ? system
+            ? "You win!"
+            : "X wins!"
+          : system
+            ? "System wins!"
+            : "O wins!"
       : OVERLAY_TEXT[state.status]
   const turnText =
     state.status === "running"
-      ? state.turn === "x"
-        ? "X to move"
-        : "O to move"
+      ? system
+        ? "Your turn"
+        : state.turn === "x"
+          ? "X to move"
+          : "O to move"
       : "Tap a cell to play"
 
   return (
-    <GameScreen
-      style={accentVars("Tic-Tac-Toe")}
-    >
+    <GameScreen style={accentVars("Tic-Tac-Toe")}>
       <GameHeader
         title="Tic-Tac-Toe"
         badges={
           <>
-            <PixelScore label="X" value={state.xWins} digits={2} />
-            <PixelScore label="O" value={state.oWins} digits={2} variant="outline" />
+            <PixelScore label={system ? "You" : "X"} value={state.xWins} digits={2} />
+            <PixelScore
+              label={system ? "CPU" : "O"}
+              value={state.oWins}
+              digits={2}
+              variant="outline"
+            />
           </>
         }
         steps={HELP_STEPS}
@@ -152,6 +163,24 @@ export function TicTacToeGame() {
         status={state.status}
         hint={`${turnText} · P pauses; R restarts`}
         onToggle={() => send({ type: "toggle" })}
+        actions={
+          <div className="flex items-center gap-1">
+            <Button
+              size="xs"
+              variant={system ? "outline" : "default"}
+              onClick={() => send({ type: "setMode", mode: "two-player" })}
+            >
+              2 Player
+            </Button>
+            <Button
+              size="xs"
+              variant={system ? "default" : "outline"}
+              onClick={() => send({ type: "setMode", mode: "system" })}
+            >
+              System
+            </Button>
+          </div>
+        }
       />
     </GameScreen>
   )

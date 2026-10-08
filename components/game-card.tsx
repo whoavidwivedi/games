@@ -3,7 +3,6 @@
 import Link from "next/link"
 
 import { GameCover } from "@/components/game-cover"
-import { Button } from "@/components/ui/button"
 import {
   Card,
   CardContent,
@@ -16,9 +15,10 @@ import type { Game } from "@/lib/games"
 import { cn } from "@/lib/utils"
 
 /**
- * A game tile. Only the heart and the Play button are interactive — tapping
- * anywhere else on the card does nothing. The cover's dither is a static
- * frozen field. Coming-soon tiles stay dimmed and show no Play button.
+ * A game tile. The whole card is one link — a stretched overlay sits behind
+ * the heart — so a phone can tap it anywhere, not just the Play pill, which
+ * stays as the visual cue. The heart rides above the overlay (z-20) so it
+ * still toggles without navigating. Tiles without an href stay dimmed.
  */
 export function GameCard({ title, description, href, waveColor }: Game) {
   const comingSoon = !href
@@ -30,8 +30,15 @@ export function GameCard({ title, description, href, waveColor }: Game) {
         comingSoon && "opacity-70"
       )}
     >
+      {href && (
+        <Link
+          href={href}
+          aria-label={`Play ${title}`}
+          className="absolute inset-0 z-10 rounded-2xl outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
+        />
+      )}
+
       <GameCover waveColor={waveColor} className="aspect-[21/10]">
-        {/* Coming-soon games can't be favourited yet, so no heart. */}
         {!comingSoon && (
           <LikeButton
             title={title}
@@ -51,17 +58,11 @@ export function GameCard({ title, description, href, waveColor }: Game) {
 
       <CardContent className="mt-auto flex items-center justify-end px-4 pt-3.5 pb-3.5">
         {href ? (
-          <Button
-            render={<Link href={href} />}
-            nativeButton={false}
-            className="rounded-full"
-          >
+          <span className="inline-flex h-8 items-center justify-center rounded-full bg-primary px-2.5 text-sm font-medium whitespace-nowrap text-primary-foreground">
             Play
-          </Button>
-        ) : (
-          <span className="text-xs font-medium text-muted-foreground">
-            Coming soon
           </span>
+        ) : (
+          <span className="text-xs text-muted-foreground">Coming soon</span>
         )}
       </CardContent>
     </Card>
